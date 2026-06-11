@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bosque: #1f3d2b;
+  --color-pino: #2f5d3a;
+  --color-musgo: #4b7a4a;
+  --color-salvia: #8fb996;
+  --color-pergamino: #f6f3e7;
+  --color-crema: #fffdf6;
+  --color-madera: #7a5230;
+  --color-amanita: #c0392b;
+  --color-amanita-oscuro: #a93226;
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-nunito), system-ui, sans-serif;
+
+  --shadow-hoja: 0 10px 30px -12px rgb(31 61 43 / 0.25);
+  --shadow-hoja-lg: 0 18px 45px -15px rgb(31 61 43 / 0.35);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-pergamino);
+  color: var(--color-bosque);
+  font-family: var(--font-body);
+  /* textura ligera de papel */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.48 0 0 0 0 0.4 0 0 0 0 0.28 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* botón amanita: rojo con lunares blancos sutiles */
+.btn-amanita {
+  background-color: var(--color-amanita);
+  background-image:
+    radial-gradient(circle 5px at 18% 30%, rgb(255 255 255 / 0.35) 0 4px, transparent 5px),
+    radial-gradient(circle 5px at 62% 75%, rgb(255 255 255 / 0.28) 0 4px, transparent 5px),
+    radial-gradient(circle 5px at 85% 25%, rgb(255 255 255 / 0.3) 0 4px, transparent 5px),
+    radial-gradient(circle 5px at 38% 80%, rgb(255 255 255 / 0.22) 0 4px, transparent 5px);
+  transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-amanita:hover {
+  background-color: var(--color-amanita-oscuro);
+  box-shadow: var(--shadow-hoja);
+}
+.btn-amanita:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .anima-aparece {
+    animation: aparece 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .anima-flota {
+    animation: flota 5s ease-in-out infinite;
+  }
+  .luciernaga {
+    animation: brilla 3.2s ease-in-out infinite;
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flota {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes brilla {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* confeti de éxito al subir una foto */
+@media (prefers-reduced-motion: no-preference) {
+  .confeti {
+    animation: cae 2.6s ease-in forwards;
+  }
+}
+
+@keyframes cae {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(540deg);
+    opacity: 0;
+  }
+}
