@@ -120,6 +120,25 @@ body {
   }
 }
 
+/* parpadeo de los ojos de la quiniela */
+@media (prefers-reduced-motion: no-preference) {
+  .ojo-parpadea {
+    animation: parpadea 5s ease-in-out infinite;
+    transform-origin: center;
+  }
+}
+
+@keyframes parpadea {
+  0%,
+  91%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+
 @keyframes late {
   0%,
   100% {

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
-  const [fotos, mensajes, predicciones] = await Promise.all([
+  const [fotos, mensajes, predicciones, resultado] = await Promise.all([
     supabase.from("fotos").select("*").order("created_at", { ascending: false }),
     supabase
       .from("mensajes")
@@ -20,6 +20,11 @@ export async function GET(req: NextRequest) {
       .from("predicciones")
       .select("*")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("quiniela_resultado")
+      .select("publicado, ojos, peso_gramos, fecha_real")
+      .eq("id", 1)
+      .maybeSingle(),
   ]);
 
   const fallo = fotos.error || mensajes.error;
@@ -32,5 +37,7 @@ export async function GET(req: NextRequest) {
     mensajes: mensajes.data ?? [],
     // la tabla predicciones es opcional: si no existe, devolvemos lista vacía
     predicciones: predicciones.error ? [] : predicciones.data ?? [],
+    // ídem quiniela_resultado: null hasta que se cree con db/quiniela.sql
+    resultado: resultado.error ? null : resultado.data,
   });
 }

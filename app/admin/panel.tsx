@@ -2,12 +2,19 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { fotoPublicUrl } from "@/lib/supabase";
-import type { Foto, Mensaje, Prediccion } from "@/lib/types";
+import type {
+  Foto,
+  Mensaje,
+  Ojos,
+  Prediccion,
+  ResultadoQuiniela,
+} from "@/lib/types";
 
 interface Datos {
   fotos: Foto[];
   mensajes: Mensaje[];
   predicciones: Prediccion[];
+  resultado: ResultadoQuiniela | null;
 }
 
 type Estado = "comprobando" | "login" | "cargando" | "listo";
@@ -216,6 +223,10 @@ export function PanelAdmin() {
         />
       </Seccion>
 
+      <Seccion titulo="Resultado real de la quiniela">
+        <FormResultado inicial={datos.resultado} />
+      </Seccion>
+
       <Seccion titulo={`Predicciones (${datos.predicciones.length})`}>
         {datos.predicciones.length === 0 ? (
           <Vacio texto="No hay predicciones todavía." />
@@ -230,7 +241,8 @@ export function PanelAdmin() {
                   <p className="font-bold text-bosque">{p.autor || "Anónimo"}</p>
                   <p className="text-madera">
                     {[
-                      p.sexo,
+                      p.ojos &&
+                        `ojos ${p.ojos === "claro" ? "claros" : "oscuros"}`,
                       p.peso_gramos && `${p.peso_gramos} g`,
                       p.fecha_estimada,
                       p.nombre_sugerido,
@@ -275,6 +287,144 @@ function Vacio({ texto }: { texto: string }) {
     <p className="rounded-2xl bg-crema/70 p-5 text-center text-sm font-semibold text-madera">
       {texto}
     </p>
+  );
+}
+
+// Valores reales del nacimiento + switch para publicar el ranking.
+function FormResultado({ inicial }: { inicial: ResultadoQuiniela | null }) {
+  const [ojos, setOjos] = useState<Ojos | null>(inicial?.ojos ?? null);
+  const [peso, setPeso] = useState(inicial?.peso_gramos?.toString() ?? "");
+  const [fecha, setFecha] = useState(inicial?.fecha_real ?? "");
+  const [publicado, setPublicado] = useState(inicial?.publicado ?? false);
+  const [guardando, setGuardando] = useState(false);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function guardar(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setMensaje(null);
+    setGuardando(true);
+    try {
+      const res = await fetch("/api/admin/resultado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          publicado,
+          ojos,
+          peso_gramos: peso ? parseInt(peso, 10) : null,
+          fecha_real: fecha || null,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || "Error al guardar");
+      }
+      setMensaje(
+        publicado
+          ? "Guardado. La quiniela ya muestra el resultado y el ranking (y cierra las apuestas)."
+          : "Guardado. El resultado sigue oculto para los invitados."
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al guardar");
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={guardar}
+      className="space-y-4 rounded-2xl bg-crema p-5 shadow-hoja"
+    >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="space-y-2">
+          <span className="block text-sm font-bold text-pino">Ojos</span>
+          <div className="flex gap-2">
+            {(["claro", "oscuro"] as const).map((opcion) => (
+              <button
+                key={opcion}
+                type="button"
+                onClick={() => setOjos(ojos === opcion ? null : opcion)}
+                className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-sm font-bold capitalize transition-colors ${
+                  ojos === opcion
+                    ? "border-musgo bg-musgo/15 text-pino"
+                    : "border-salvia/60 bg-pergamino text-madera"
+                }`}
+              >
+                {opcion}s
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="r-peso" className="block text-sm font-bold text-pino">
+            Peso (gramos)
+          </label>
+          <input
+            id="r-peso"
+            type="number"
+            inputMode="numeric"
+            min={500}
+            max={7000}
+            value={peso}
+            onChange={(e) => setPeso(e.target.value)}
+            placeholder="3400"
+            className="w-full rounded-xl border-2 border-salvia/60 bg-pergamino px-4 py-2.5 text-bosque outline-none placeholder:text-bosque/40 focus:border-musgo"
+          />
+        </div>
+        <div className="space-y-2">
+          <label
+            htmlFor="r-fecha"
+            className="block text-sm font-bold text-pino"
+          >
+            Fecha de nacimiento
+          </label>
+          <input
+            id="r-fecha"
+            type="date"
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
+            className="w-full rounded-xl border-2 border-salvia/60 bg-pergamino px-4 py-2.5 text-bosque outline-none focus:border-musgo"
+          />
+        </div>
+      </div>
+
+      <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-pergamino px-4 py-3">
+        <span className="text-sm font-bold text-pino">
+          Publicar en la quiniela
+          <span className="block font-normal text-madera">
+            Los invitados verán el resultado y el ranking; se cierran las
+            apuestas.
+          </span>
+        </span>
+        <input
+          type="checkbox"
+          checked={publicado}
+          onChange={(e) => setPublicado(e.target.checked)}
+          className="h-5 w-5 shrink-0 accent-musgo"
+        />
+      </label>
+
+      {error && (
+        <p className="rounded-xl bg-amanita/10 px-4 py-2 text-sm font-semibold text-amanita">
+          {error}
+        </p>
+      )}
+      {mensaje && !error && (
+        <p className="rounded-xl bg-musgo/15 px-4 py-2 text-sm font-semibold text-pino">
+          {mensaje}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={guardando}
+        className="btn-amanita rounded-full px-6 py-3 font-bold text-white disabled:opacity-60"
+      >
+        {guardando ? "Guardando..." : "Guardar resultado"}
+      </button>
+    </form>
   );
 }
 

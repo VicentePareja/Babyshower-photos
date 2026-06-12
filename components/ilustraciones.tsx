@@ -88,6 +88,29 @@ export function Corazon({ className = "" }: { className?: string }) {
   );
 }
 
+export function Ojo({
+  tono,
+  className = "",
+}: {
+  tono: "claro" | "oscuro";
+  className?: string;
+}) {
+  const iris = tono === "claro" ? "#8fb996" : "#4a2e15";
+  return (
+    <svg viewBox="0 0 64 40" className={className} aria-hidden="true">
+      <path
+        d="M2 20 Q32 -8 62 20 Q32 48 2 20 Z"
+        fill="#fffdf6"
+        stroke="#1f3d2b"
+        strokeWidth="2"
+      />
+      <circle cx="32" cy="20" r="11" fill={iris} />
+      <circle cx="32" cy="20" r="5.5" fill="#1f3d2b" />
+      <circle cx="35.5" cy="16.5" r="2.2" fill="#fffdf6" opacity="0.85" />
+    </svg>
+  );
+}
+
 export function Camara({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
