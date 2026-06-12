@@ -33,9 +33,7 @@ export default function PaginaOraculo() {
             <BolaCristal className="anima-flota mx-auto h-28 w-28" />
             <p className="mx-auto mt-3 max-w-md text-salvia">
               El bosque duerme y el oráculo despierta. Mira la bola de
-              cristal y deja tu profecía: ¿cuánto pesará Octavio? ¿cuándo
-              llegará? ¿de qué color serán sus ojos? Cuando él nazca,
-              sabremos quién vio el futuro.
+              cristal y deja tu profecía.
             </p>
           </section>
           <div className="mt-6">
