@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    // la quiniela se rebautizó como El Oráculo del Bosque
+    return [
+      { source: "/quiniela", destination: "/oraculo", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {

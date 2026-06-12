@@ -105,14 +105,14 @@ export default function Inicio() {
       </nav>
 
       {/* Extras */}
-      {(FLAGS.quiniela || FLAGS.slideshow) && (
+      {(FLAGS.oraculo || FLAGS.slideshow) && (
         <footer className="mt-10 flex flex-wrap justify-center gap-4 text-sm font-bold">
-          {FLAGS.quiniela && (
+          {FLAGS.oraculo && (
             <Link
-              href="/quiniela"
+              href="/oraculo"
               className="rounded-full bg-pino px-5 py-3 text-pergamino transition-transform active:scale-95"
             >
-              Juega la quiniela del bebé
+              🔮 Consulta el Oráculo del Bosque
             </Link>
           )}
           {FLAGS.slideshow && (

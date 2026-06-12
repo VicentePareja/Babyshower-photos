@@ -7,14 +7,14 @@ import type {
   Mensaje,
   Ojos,
   Prediccion,
-  ResultadoQuiniela,
+  ResultadoOraculo,
 } from "@/lib/types";
 
 interface Datos {
   fotos: Foto[];
   mensajes: Mensaje[];
   predicciones: Prediccion[];
-  resultado: ResultadoQuiniela | null;
+  resultado: ResultadoOraculo | null;
 }
 
 type Estado = "comprobando" | "login" | "cargando" | "listo";
@@ -223,7 +223,7 @@ export function PanelAdmin() {
         />
       </Seccion>
 
-      <Seccion titulo="Resultado real de la quiniela">
+      <Seccion titulo="Resultado real del oráculo">
         <FormResultado inicial={datos.resultado} />
       </Seccion>
 
@@ -291,7 +291,7 @@ function Vacio({ texto }: { texto: string }) {
 }
 
 // Valores reales del nacimiento + switch para publicar el ranking.
-function FormResultado({ inicial }: { inicial: ResultadoQuiniela | null }) {
+function FormResultado({ inicial }: { inicial: ResultadoOraculo | null }) {
   const [ojos, setOjos] = useState<Ojos | null>(inicial?.ojos ?? null);
   const [peso, setPeso] = useState(inicial?.peso_gramos?.toString() ?? "");
   const [fecha, setFecha] = useState(inicial?.fecha_real ?? "");
@@ -322,7 +322,7 @@ function FormResultado({ inicial }: { inicial: ResultadoQuiniela | null }) {
       }
       setMensaje(
         publicado
-          ? "Guardado. La quiniela ya muestra el resultado y el ranking (y cierra las apuestas)."
+          ? "Guardado. El oráculo ya muestra el resultado y el ranking (y cierra las apuestas)."
           : "Guardado. El resultado sigue oculto para los invitados."
       );
     } catch (e) {
@@ -392,7 +392,7 @@ function FormResultado({ inicial }: { inicial: ResultadoQuiniela | null }) {
 
       <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-pergamino px-4 py-3">
         <span className="text-sm font-bold text-pino">
-          Publicar en la quiniela
+          Publicar en el oráculo
           <span className="block font-normal text-madera">
             Los invitados verán el resultado y el ranking; se cierran las
             apuestas.

@@ -1,23 +1,29 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Bellota, Brote, Champinon, Ojo } from "@/components/ilustraciones";
+import {
+  Bellota,
+  BolaCristal,
+  Brote,
+  Champinon,
+  Ojo,
+} from "@/components/ilustraciones";
 import { getSupabase } from "@/lib/supabase";
-import type { Ojos, Prediccion, ResultadoQuiniela } from "@/lib/types";
+import type { Ojos, Prediccion, ResultadoOraculo } from "@/lib/types";
 
 const MAX_AUTOR = 80;
 const MAX_NOMBRE = 60;
 
-const SIN_RESULTADO: ResultadoQuiniela = {
+const SIN_RESULTADO: ResultadoOraculo = {
   publicado: false,
   ojos: null,
   peso_gramos: null,
   fecha_real: null,
 };
 
-export function Quiniela() {
+export function Oraculo() {
   const [predicciones, setPredicciones] = useState<Prediccion[]>([]);
-  const [resultado, setResultado] = useState<ResultadoQuiniela>(SIN_RESULTADO);
+  const [resultado, setResultado] = useState<ResultadoOraculo>(SIN_RESULTADO);
   const [autor, setAutor] = useState("");
   const [ojos, setOjos] = useState<Ojos | null>(null);
   const [peso, setPeso] = useState("");
@@ -43,9 +49,9 @@ export function Quiniela() {
 
   useEffect(() => {
     cargar();
-    fetch("/api/quiniela/resultado")
+    fetch("/api/oraculo/resultado")
       .then((r) => (r.ok ? r.json() : null))
-      .then((r: ResultadoQuiniela | null) => r && setResultado(r))
+      .then((r: ResultadoOraculo | null) => r && setResultado(r))
       .catch(() => {
         // sin resultado publicado todavía
       });
@@ -60,7 +66,7 @@ export function Quiniela() {
     }
 
     if (!ojos) {
-      setError("Adivina cómo serán sus ojos 👀");
+      setError("El oráculo necesita saber cómo serán sus ojos 👀");
       return;
     }
     const pesoGramos = peso ? parseInt(peso, 10) : null;
@@ -122,6 +128,9 @@ export function Quiniela() {
           onSubmit={enviar}
           className="anima-aparece space-y-4 rounded-3xl bg-crema p-5 shadow-hoja"
         >
+          <p className="text-center font-display text-lg font-bold text-bosque">
+            ✨ Tu profecía ✨
+          </p>
           <div className="space-y-2">
             <label
               htmlFor="q-autor"
@@ -213,7 +222,7 @@ export function Quiniela() {
               htmlFor="q-nombre"
               className="block text-sm font-bold text-pino"
             >
-              ¿Qué nombre le habrías puesto tú?
+              Si ganas la predicción, ¿qué segundo nombre le pondrías?
             </label>
             <input
               id="q-nombre"
@@ -244,7 +253,8 @@ export function Quiniela() {
           )}
           {exito && !error && (
             <p className="rounded-xl bg-musgo/15 px-4 py-2 text-sm font-semibold text-pino">
-              ¡Predicción guardada! Que el bosque decida quién acierta.
+              Tu profecía quedó sellada ✨ Las estrellas dirán quién vio el
+              futuro.
             </p>
           )}
 
@@ -253,7 +263,7 @@ export function Quiniela() {
             disabled={enviando}
             className="btn-amanita w-full rounded-full px-6 py-4 text-lg font-bold text-white disabled:opacity-60"
           >
-            {enviando ? "Guardando..." : "Apostar mi predicción"}
+            {enviando ? "Consultando a las estrellas..." : "🔮 Sellar mi profecía"}
           </button>
         </form>
       )}
@@ -261,10 +271,10 @@ export function Quiniela() {
       {predicciones.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center gap-3">
-            <Bellota className="h-8 w-8" />
-            <h2 className="font-display text-xl font-bold text-bosque">
-              Lo que dice el bosque ({predicciones.length}{" "}
-              {predicciones.length === 1 ? "predicción" : "predicciones"})
+            <BolaCristal className="h-9 w-9" />
+            <h2 className="font-display text-xl font-bold text-pergamino">
+              Las visiones del oráculo ({predicciones.length}{" "}
+              {predicciones.length === 1 ? "profecía" : "profecías"})
             </h2>
           </div>
 
@@ -329,7 +339,7 @@ export function Quiniela() {
           {nombres.length > 0 && (
             <div className="rounded-2xl bg-crema p-5 shadow-hoja">
               <p className="text-sm font-bold text-pino">
-                Nombres que sugería el bosque
+                Segundos nombres que susurran las estrellas
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {nombres.map((p) => (
@@ -389,7 +399,7 @@ interface Puntaje {
 // Fecha: hasta 35 pts (0 a 21 días de error).
 function calcularRanking(
   predicciones: Prediccion[],
-  real: ResultadoQuiniela
+  real: ResultadoOraculo
 ): Puntaje[] {
   return predicciones
     .map((p) => {
@@ -445,16 +455,17 @@ function ResultadoReal({
   resultado,
   ranking,
 }: {
-  resultado: ResultadoQuiniela;
+  resultado: ResultadoOraculo;
   ranking: Puntaje[];
 }) {
   return (
     <section className="anima-aparece space-y-4">
-      <div className="rounded-3xl bg-pino p-6 text-center text-pergamino shadow-hoja-lg">
+      <div className="rounded-3xl bg-pino p-6 text-center text-pergamino shadow-hoja-lg ring-1 ring-salvia/40">
         <Champinon className="anima-flota mx-auto h-12 w-12" />
         <h2 className="mt-2 font-display text-2xl font-bold">
           ¡Octavio ya llegó al bosque!
         </h2>
+        <p className="mt-1 text-sm text-salvia">El oráculo revela su verdad:</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           {resultado.ojos && (
             <DatoReal
@@ -477,7 +488,7 @@ function ResultadoReal({
       {ranking.length > 0 && (
         <div className="rounded-3xl bg-crema p-5 shadow-hoja">
           <h3 className="font-display text-xl font-bold text-bosque">
-            🏆 El ranking del bosque
+            🏆 Los videntes del bosque
           </h3>
           <ol className="mt-4 space-y-2">
             {ranking.map((r, i) => (

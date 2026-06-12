@@ -111,6 +111,94 @@ export function Ojo({
   );
 }
 
+// Bola de cristal del oráculo: dentro se asoma el bosque.
+export function BolaCristal({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <circle cx="32" cy="28" r="24" fill="#8FB996" opacity="0.16" />
+      <circle cx="32" cy="28" r="19" fill="#BCD9C4" />
+      <circle cx="32" cy="28" r="19" fill="#DCEEE2" opacity="0.55" />
+      {/* champiñón que se ve en la visión */}
+      <path d="M25 34c0-4.5 3.2-8 7-8s7 3.5 7 8Z" fill="#C0392B" />
+      <circle cx="29" cy="30.5" r="1.2" fill="#F6F3E7" opacity="0.85" />
+      <circle cx="35" cy="32" r="1" fill="#F6F3E7" opacity="0.85" />
+      <rect x="30" y="34" width="4" height="6" rx="1.6" fill="#F6F3E7" />
+      {/* brillo del vidrio */}
+      <circle cx="25" cy="20" r="5" fill="#FFFDF6" opacity="0.8" />
+      <circle cx="40" cy="36" r="2.5" fill="#FFFDF6" opacity="0.4" />
+      {/* base de madera */}
+      <path d="M20 47h24l-3.5 9H23.5Z" fill="#7A5230" />
+      <ellipse cx="32" cy="47" rx="12.5" ry="3" fill="#5D3E24" />
+      {/* destellos */}
+      <path d="M50 10l1.3 3.2 3.2 1.3-3.2 1.3-1.3 3.2-1.3-3.2-3.2-1.3 3.2-1.3Z" fill="#F5D76E" />
+      <path d="M12 16l0.9 2.2 2.2 0.9-2.2 0.9-0.9 2.2-0.9-2.2-2.2-0.9 2.2-0.9Z" fill="#F5D76E" opacity="0.8" />
+    </svg>
+  );
+}
+
+export function Luna({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <circle cx="30" cy="32" r="26" fill="#F5D76E" opacity="0.14" />
+      <mask id="luna-sombra">
+        <rect width="64" height="64" fill="#fff" />
+        <circle cx="42" cy="25" r="19" fill="#000" />
+      </mask>
+      <circle cx="30" cy="32" r="21" fill="#F5D76E" mask="url(#luna-sombra)" />
+    </svg>
+  );
+}
+
+// Cielo estrellado decorativo; las estrellas titilan con la clase .luciernaga.
+export function Estrellas({ className = "" }: { className?: string }) {
+  const estrellas = [
+    { x: 14, y: 18, r: 1.6, d: "0s" },
+    { x: 38, y: 9, r: 1.1, d: "1.4s" },
+    { x: 62, y: 22, r: 1.8, d: "0.6s" },
+    { x: 90, y: 12, r: 1.2, d: "2.1s" },
+    { x: 118, y: 26, r: 1.5, d: "0.9s" },
+    { x: 146, y: 8, r: 1.1, d: "1.8s" },
+    { x: 170, y: 20, r: 1.7, d: "0.3s" },
+    { x: 188, y: 38, r: 1.2, d: "2.4s" },
+    { x: 26, y: 44, r: 1.1, d: "1.1s" },
+    { x: 78, y: 48, r: 1.4, d: "1.9s" },
+    { x: 132, y: 52, r: 1.1, d: "0.5s" },
+    { x: 160, y: 64, r: 1.3, d: "2.7s" },
+  ];
+  return (
+    <svg
+      viewBox="0 0 200 80"
+      className={className}
+      aria-hidden="true"
+      preserveAspectRatio="xMidYMin slice"
+    >
+      {estrellas.map((e) => (
+        <circle
+          key={`${e.x}-${e.y}`}
+          cx={e.x}
+          cy={e.y}
+          r={e.r}
+          fill="#FFFDF6"
+          className="luciernaga"
+          style={{ animationDelay: e.d }}
+        />
+      ))}
+      <path
+        d="M104 30l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6Z"
+        fill="#F5D76E"
+        className="luciernaga"
+        style={{ animationDelay: "1.5s" }}
+      />
+      <path
+        d="M50 56l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2Z"
+        fill="#F5D76E"
+        className="luciernaga"
+        style={{ animationDelay: "0.2s" }}
+      />
+    </svg>
+  );
+}
+
 export function Camara({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">

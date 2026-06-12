@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import type { ResultadoQuiniela } from "@/lib/types";
+import type { ResultadoOraculo } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const OCULTO: ResultadoQuiniela = {
+const OCULTO: ResultadoOraculo = {
   publicado: false,
   ojos: null,
   peso_gramos: null,
   fecha_real: null,
 };
 
-// Resultado real de la quiniela, visible para todos SOLO cuando el admin
+// Resultado real del oráculo, visible para todos SOLO cuando el admin
 // lo publica. Se lee con service role para que la tabla no necesite
 // políticas públicas (así nadie puede espiarlo antes de tiempo).
 export async function GET() {

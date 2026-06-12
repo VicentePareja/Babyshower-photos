@@ -1,5 +1,5 @@
 // Extras opcionales: pon en false para ocultarlos sin borrar código.
 export const FLAGS = {
   slideshow: true,
-  quiniela: true,
+  oraculo: true,
 } as const;

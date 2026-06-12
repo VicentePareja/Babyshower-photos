@@ -30,7 +30,7 @@ export interface Prediccion {
   nombre_sugerido: string | null;
 }
 
-export interface ResultadoQuiniela {
+export interface ResultadoOraculo {
   publicado: boolean;
   ojos: Ojos | null;
   peso_gramos: number | null;
