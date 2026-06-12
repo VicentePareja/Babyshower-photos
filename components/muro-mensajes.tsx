@@ -1,21 +1,33 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import type { Destinatario, Mensaje } from "@/lib/types";
 import { Brote, Corazon } from "./ilustraciones";
 
 const MAX_CUERPO = 1000;
 const MAX_AUTOR = 80;
+const REFRESCO_MS = 30_000;
 
 interface Props {
   destinatario: Destinatario;
   placeholder: string;
+  etiquetaCuerpo?: string;
+  /** Oculta el muro: los mensajes son secretos y solo se muestra cuántos van. */
+  privado?: boolean;
 }
 
 // Formulario + muro de mensajes, compartido por /deseos-bebe y /mensajes-padres.
-export function MuroMensajes({ destinatario, placeholder }: Props) {
+export function MuroMensajes({
+  destinatario,
+  placeholder,
+  etiquetaCuerpo = "Tu mensaje",
+  privado = false,
+}: Props) {
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
+  const [total, setTotal] = useState<number | null>(null);
+  const [rafaga, setRafaga] = useState(0); // cada incremento suelta corazones
+  const totalPrevio = useRef<number | null>(null);
   const [cargando, setCargando] = useState(true);
   const [autor, setAutor] = useState("");
   const [cuerpo, setCuerpo] = useState("");
@@ -26,24 +38,45 @@ export function MuroMensajes({ destinatario, placeholder }: Props) {
 
   const cargar = useCallback(async () => {
     try {
-      const { data, error: err } = await getSupabase()
-        .from("mensajes")
-        .select("*")
-        .eq("destinatario", destinatario)
-        .order("created_at", { ascending: false })
-        .limit(200);
-      if (err) throw err;
-      setMensajes(data ?? []);
+      if (privado) {
+        const { count, error: err } = await getSupabase()
+          .from("mensajes")
+          .select("id", { count: "exact", head: true })
+          .eq("destinatario", destinatario);
+        if (err) throw err;
+        if (count !== null) {
+          if (totalPrevio.current !== null && count > totalPrevio.current) {
+            setRafaga((r) => r + 1);
+          }
+          totalPrevio.current = count;
+          setTotal(count);
+        }
+      } else {
+        const { data, error: err } = await getSupabase()
+          .from("mensajes")
+          .select("*")
+          .eq("destinatario", destinatario)
+          .order("created_at", { ascending: false })
+          .limit(200);
+        if (err) throw err;
+        setMensajes(data ?? []);
+      }
     } catch {
-      setError("No pudimos cargar los mensajes. Revisa tu conexión.");
+      // en modo privado el polling falla en silencio y conservamos el último total
+      if (!privado) {
+        setError("No pudimos cargar los mensajes. Revisa tu conexión.");
+      }
     } finally {
       setCargando(false);
     }
-  }, [destinatario]);
+  }, [destinatario, privado]);
 
   useEffect(() => {
     cargar();
-  }, [cargar]);
+    if (!privado) return;
+    const timer = setInterval(cargar, REFRESCO_MS);
+    return () => clearInterval(timer);
+  }, [cargar, privado]);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -71,6 +104,12 @@ export function MuroMensajes({ destinatario, placeholder }: Props) {
       if (err) throw err;
       setCuerpo("");
       setExito(true);
+      if (privado) {
+        // actualización optimista para que el corazón celebre al instante
+        totalPrevio.current = (totalPrevio.current ?? 0) + 1;
+        setTotal(totalPrevio.current);
+        setRafaga((r) => r + 1);
+      }
       await cargar();
     } catch {
       setError("No se pudo enviar. Inténtalo de nuevo en un momento.");
@@ -87,7 +126,8 @@ export function MuroMensajes({ destinatario, placeholder }: Props) {
       >
         <div className="space-y-2">
           <label htmlFor="autor" className="block text-sm font-bold text-pino">
-            Tu nombre <span className="font-normal text-madera">(opcional)</span>
+            Nombre(s){" "}
+            <span className="font-normal text-madera">(opcional)</span>
           </label>
           <input
             id="autor"
@@ -102,7 +142,7 @@ export function MuroMensajes({ destinatario, placeholder }: Props) {
 
         <div className="space-y-2">
           <label htmlFor="cuerpo" className="block text-sm font-bold text-pino">
-            Tu mensaje
+            {etiquetaCuerpo}
           </label>
           <textarea
             id="cuerpo"
@@ -151,32 +191,91 @@ export function MuroMensajes({ destinatario, placeholder }: Props) {
         </button>
       </form>
 
-      <section aria-label="Mensajes enviados" className="space-y-4">
-        {cargando ? (
-          <ListaEsqueleto />
-        ) : mensajes.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-3xl bg-crema/70 px-6 py-10 text-center">
-            <Corazon className="h-10 w-10" />
-            <p className="font-semibold text-madera">
-              Todavía no hay mensajes. ¡Sé quien deje el primero!
+      {privado ? (
+        <section
+          aria-label="Deseos guardados"
+          className="anima-aparece relative overflow-hidden rounded-3xl bg-crema px-6 py-10 text-center shadow-hoja"
+        >
+          {rafaga > 0 && <CorazonesFlotantes key={rafaga} />}
+          <Corazon className="anima-late mx-auto h-14 w-14" />
+          {cargando ? (
+            <p className="mt-4 animate-pulse font-semibold text-madera">
+              Contando deseos...
             </p>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            {mensajes.map((m) => (
-              <li
-                key={m.id}
-                className="anima-aparece rounded-3xl bg-crema p-5 shadow-hoja"
+          ) : (
+            <>
+              <p
+                key={total}
+                className="anima-aparece mt-4 font-display text-5xl font-bold text-pino tabular-nums"
               >
-                <p className="whitespace-pre-wrap text-bosque">{m.cuerpo}</p>
-                <p className="mt-3 text-sm font-bold text-madera">
-                  {m.autor || "Alguien del bosque"}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                {total ?? "·"}
+              </p>
+              <p className="mt-1 font-semibold text-madera">
+                {total === 1
+                  ? "deseo guardado para Octavio"
+                  : "deseos guardados para Octavio"}
+              </p>
+              <p className="mt-4 text-sm text-madera/80">
+                Son secretos 🤫 — solo él los leerá cuando crezca.
+              </p>
+            </>
+          )}
+        </section>
+      ) : (
+        <section aria-label="Mensajes enviados" className="space-y-4">
+          {cargando ? (
+            <ListaEsqueleto />
+          ) : mensajes.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 rounded-3xl bg-crema/70 px-6 py-10 text-center">
+              <Corazon className="h-10 w-10" />
+              <p className="font-semibold text-madera">
+                Todavía no hay mensajes. ¡Sé quien deje el primero!
+              </p>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {mensajes.map((m) => (
+                <li
+                  key={m.id}
+                  className="anima-aparece rounded-3xl bg-crema p-5 shadow-hoja"
+                >
+                  <p className="whitespace-pre-wrap text-bosque">{m.cuerpo}</p>
+                  <p className="mt-3 text-sm font-bold text-madera">
+                    {m.autor || "Alguien del bosque"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+    </div>
+  );
+}
+
+const BROTE_CORAZONES = [
+  { left: "10%", delay: "0s", tamano: "h-5 w-5" },
+  { left: "26%", delay: "0.25s", tamano: "h-7 w-7" },
+  { left: "46%", delay: "0.1s", tamano: "h-6 w-6" },
+  { left: "62%", delay: "0.4s", tamano: "h-5 w-5" },
+  { left: "80%", delay: "0.18s", tamano: "h-7 w-7" },
+  { left: "36%", delay: "0.55s", tamano: "h-4 w-4" },
+  { left: "72%", delay: "0.65s", tamano: "h-5 w-5" },
+];
+
+// Corazones que suben flotando cuando se agrega un deseo nuevo.
+function CorazonesFlotantes() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      {BROTE_CORAZONES.map((c, i) => (
+        <span
+          key={i}
+          className="corazon-flotante absolute bottom-2"
+          style={{ left: c.left, animationDelay: c.delay }}
+        >
+          <Corazon className={c.tamano} />
+        </span>
+      ))}
     </div>
   );
 }

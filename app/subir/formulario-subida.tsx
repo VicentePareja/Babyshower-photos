@@ -169,7 +169,7 @@ export function FormularioSubida() {
 
           <div className="space-y-2">
             <label htmlFor="autor" className="block text-sm font-bold text-pino">
-              Tu nombre{" "}
+              Nombre(s){" "}
               <span className="font-normal text-madera">(opcional)</span>
             </label>
             <input

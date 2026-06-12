@@ -91,6 +91,54 @@ body {
   }
 }
 
+/* corazones del contador de deseos */
+.corazon-flotante {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .corazon-flotante {
+    animation: sube-corazon 2s ease-out forwards;
+  }
+  .anima-late {
+    animation: late 1.8s ease-in-out infinite;
+    transform-origin: center;
+  }
+}
+
+@keyframes sube-corazon {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-150px) scale(1.1) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+@keyframes late {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  10% {
+    transform: scale(1.12);
+  }
+  20% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.08);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
 /* confeti de éxito al subir una foto */
 @media (prefers-reduced-motion: no-preference) {
   .confeti {

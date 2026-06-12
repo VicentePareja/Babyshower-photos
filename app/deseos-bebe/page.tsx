@@ -12,12 +12,14 @@ export default function DeseosBebe() {
       <Encabezado titulo="Deseos para Octavio" />
       <div className="mx-auto w-full max-w-2xl px-4 pb-14">
         <p className="anima-aparece mb-5 rounded-2xl bg-salvia/25 px-5 py-4 text-pino">
-          Esta es una cápsula del tiempo: estos deseos los leerá Octavio en el
-          futuro 🌱. Cuéntale qué le deseas para su vida.
+          Esta es una cápsula del tiempo: déjale un deseo o un consejo que
+          Octavio leerá en el futuro 🌱. Es secreto — nadie más lo verá.
         </p>
         <MuroMensajes
           destinatario="bebe"
-          placeholder="Querido Octavio, te deseo..."
+          placeholder="Querido Octavio, te deseo... (o te aconsejo...)"
+          etiquetaCuerpo="Tu deseo o consejo"
+          privado
         />
       </div>
     </main>
