@@ -25,9 +25,54 @@ existe tal cual (`app/subir/page.tsx`): no la renombres.**
 | `/mensajes-padres` | Mensajes para Vicente y Melani |
 | `/quiniela` | (extra, flag) predicciones de peso, fecha y nombre |
 | `/slideshow` | (extra, flag) carrusel fullscreen para proyectar en TV |
-| `/admin` | Panel privado: ver/borrar todo y descargar ZIP de recuerdos |
+| `/trivia` | (extra, flag) **jugador**: entra con PIN + nombre y juega desde el celular |
+| `/trivia/host` | (extra, flag) **proyección**: PIN+QR, pregunta, timer, ranking y podio |
+| `/admin` | Panel privado: recuerdos + **sección Trivia** (preguntas, ajustes y control en vivo) |
 
 Los extras se apagan en `lib/flags.ts` sin tocar nada más.
+
+## Trivia en vivo (Kahoot del bosque)
+
+Trivia multijugador para el evento presencial. Tres vistas:
+
+- **Jugador** (`/trivia`, mobile-first): entra con PIN + nombre, responde y ve
+  su feedback (puntos, racha, posición). Reconecta solo si se cae el wifi
+  (guarda su id en `localStorage`).
+- **Host** (`/trivia/host`, proyector): muestra PIN + QR para unirse, la
+  pregunta, el cronómetro, cuántos respondieron, la distribución y el ranking;
+  al final, podio de los 3 primeros. Si abriste sesión en `/admin` **en el mismo
+  navegador**, aparece arriba una barra para controlar la partida.
+- **Admin** (`/admin` → sección *Trivia*): pestañas **En vivo** (abrir lobby,
+  iniciar, siguiente, mostrar resultados, pausar, saltar, terminar, reiniciar,
+  reset total, expulsar/renombrar jugadores, exportar CSV/JSON), **Preguntas**
+  (CRUD, reordenar, activar/desactivar) y **Ajustes** (timer, puntaje, racha,
+  PIN, sonidos/animaciones).
+
+### Realtime y arquitectura
+
+- **Supabase Realtime** (no Socket.IO): el sitio vive en Vercel serverless, así
+  que un servidor WebSocket propio no encaja. Reusa el Supabase que ya está.
+- Única fuente de verdad en la BD: la tabla `trivia_juego` (con las respuestas
+  correctas, **solo accesible por el service role**). Una tabla pública
+  `trivia_pulso` espeja el estado *sin secretos* y se publica por Realtime; el
+  cliente la escucha y refetchea el estado sanitizado.
+- **Anti-trampa**: el servidor valida el tiempo (no el reloj del cliente), las
+  respuestas correctas nunca viajan al cliente antes del *reveal*, y un `unique`
+  en BD impide cambiar la respuesta una vez enviada.
+- Soporta ~100 jugadores simultáneos sin servidor extra.
+
+### SQL para Supabase (¡requerido!)
+
+Pega `db/trivia.sql` en **Supabase → SQL Editor → Run** una sola vez. Crea las
+tablas (`trivia_juego`, `trivia_pulso`, `trivia_jugadores`, `trivia_respuestas`),
+las policies RLS y la publicación de Realtime. Sin esto, el juego no persiste.
+
+Las 15 preguntas viven en `lib/trivia/preguntas.ts` como seed editable; al
+guardarlas desde el panel quedan en `trivia_juego.preguntas`.
+
+> **Para probar la partida** en local o producción: corre `db/trivia.sql`, entra
+> a `/admin`, abre la sección *Trivia → En vivo → Abrir lobby → Iniciar*, y
+> proyecta `/trivia/host`. Los invitados escanean el QR (apunta a `/trivia?pin=…`).
 
 ## Instalación
 

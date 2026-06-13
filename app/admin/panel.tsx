@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { fotoPublicUrl } from "@/lib/supabase";
+import { TriviaAdmin } from "./trivia-admin";
 import type {
   Foto,
   Mensaje,
@@ -170,6 +171,10 @@ export function PanelAdmin() {
           {error}
         </p>
       )}
+
+      <Seccion titulo="Trivia / Competencia en vivo">
+        <TriviaAdmin />
+      </Seccion>
 
       <Seccion titulo={`Fotos (${datos.fotos.length})`}>
         {datos.fotos.length === 0 ? (

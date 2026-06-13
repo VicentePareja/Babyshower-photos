@@ -105,8 +105,16 @@ export default function Inicio() {
       </nav>
 
       {/* Extras */}
-      {(FLAGS.oraculo || FLAGS.slideshow) && (
+      {(FLAGS.oraculo || FLAGS.slideshow || FLAGS.trivia) && (
         <footer className="mt-10 flex flex-wrap justify-center gap-4 text-sm font-bold">
+          {FLAGS.trivia && (
+            <Link
+              href="/trivia"
+              className="rounded-full bg-amanita px-5 py-3 text-pergamino transition-transform active:scale-95"
+            >
+              🍄 Jugar la Competencia
+            </Link>
+          )}
           {FLAGS.oraculo && (
             <Link
               href="/oraculo"

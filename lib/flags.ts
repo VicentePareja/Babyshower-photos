@@ -2,4 +2,5 @@
 export const FLAGS = {
   slideshow: true,
   oraculo: true,
+  trivia: true,
 } as const;
