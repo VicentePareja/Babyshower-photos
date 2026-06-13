@@ -429,6 +429,34 @@ function EditorPreguntas({
     setGuardando(false);
   }
 
+  // Restaura las 15 preguntas oficiales desde el código y recarga el editor.
+  async function restaurarOficiales() {
+    if (
+      !confirm(
+        "Esto reemplaza las preguntas guardadas por las 15 oficiales (con las respuestas corregidas). ¿Continuar?"
+      )
+    )
+      return;
+    setGuardando(true);
+    setError(null);
+    setMsg(null);
+    const res = await fetch("/api/admin/trivia", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reseed: true }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error || "No se pudo restaurar");
+    } else {
+      const r = await fetch("/api/admin/trivia", { cache: "no-store" });
+      if (r.ok) setPreguntas((await r.json()).preguntas);
+      setMsg("Preguntas oficiales restauradas ✔");
+      onGuardado();
+    }
+    setGuardando(false);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -444,6 +472,13 @@ function EditorPreguntas({
           className="btn-amanita rounded-full px-5 py-2 text-sm font-bold text-white disabled:opacity-60"
         >
           {guardando ? "Guardando…" : "Guardar preguntas"}
+        </button>
+        <button
+          onClick={restaurarOficiales}
+          disabled={guardando}
+          className="rounded-full border-2 border-pino px-4 py-2 text-sm font-bold text-pino disabled:opacity-60"
+        >
+          ♻︎ Restaurar preguntas oficiales
         </button>
         {msg && <span className="text-sm font-bold text-pino">{msg}</span>}
         {error && (

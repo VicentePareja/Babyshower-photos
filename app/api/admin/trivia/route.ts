@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAuthorized } from "@/lib/admin-session";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getJuego } from "@/lib/trivia/servidor";
+import {
+  DESCRIPCION_JUEGO,
+  NOMBRE_JUEGO,
+  PREGUNTAS_SEED,
+} from "@/lib/trivia/preguntas";
 import { CONFIG_DEFAULT, type ConfigJuego, type Pregunta } from "@/lib/trivia/tipos";
 
 export const runtime = "nodejs";
@@ -38,6 +43,25 @@ export async function POST(req: NextRequest) {
   const update: Record<string, unknown> = {
     actualizado_at: new Date().toISOString(),
   };
+
+  // Re-sembrar: restaura las 15 preguntas oficiales (y nombre/descripción) desde
+  // el código. Útil para empujar correcciones a una partida ya creada en la BD.
+  if (body.reseed === true) {
+    await getJuego();
+    const { error } = await getSupabaseAdmin()
+      .from("trivia_juego")
+      .update({
+        preguntas: PREGUNTAS_SEED,
+        nombre: NOMBRE_JUEGO,
+        descripcion: DESCRIPCION_JUEGO,
+        actualizado_at: new Date().toISOString(),
+      })
+      .eq("id", 1);
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true, reseed: true });
+  }
+
   if (typeof body.nombre === "string") update.nombre = body.nombre.slice(0, 120);
   if (typeof body.descripcion === "string")
     update.descripcion = body.descripcion.slice(0, 500);

@@ -1,7 +1,11 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { PREGUNTAS_SEED } from "./preguntas";
+import {
+  DESCRIPCION_JUEGO,
+  NOMBRE_JUEGO,
+  PREGUNTAS_SEED,
+} from "./preguntas";
 import {
   CONFIG_DEFAULT,
   type ConfigJuego,
@@ -47,9 +51,8 @@ export async function getJuego(
 
   const base = {
     id: 1,
-    nombre: "Competencia del Baby Shower de Meli y Vicente",
-    descripcion:
-      "Pon a prueba tu memoria y cariño: embarazo, fechas, lugares, meconio y calostro.",
+    nombre: NOMBRE_JUEGO,
+    descripcion: DESCRIPCION_JUEGO,
     pin: nuevoPin(),
     estado: "cerrado" as EstadoJuego,
     pregunta_idx: -1,

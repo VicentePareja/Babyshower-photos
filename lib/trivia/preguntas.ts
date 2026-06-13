@@ -1,5 +1,12 @@
 import type { Pregunta } from "./tipos";
 
+// Nombre y descripción oficiales del juego (también se usan al re-sembrar).
+export const NOMBRE_JUEGO = "Trivia del Baby Shower de Meli y Vicente";
+export const DESCRIPCION_JUEGO =
+  "Pon a prueba tu memoria y cariño con preguntas sobre el embarazo, fechas " +
+  "clave, lugares, signos, meconio y calostro. Celebra a Melani y Vicente " +
+  "adivinando detalles del bebé y de la abuela Shirley.";
+
 // Seed de las 15 preguntas. Editable a mano aquí o desde el panel /admin
 // (que guarda una copia en la BD). Marca de respuesta(s) correcta(s) en
 // `correctas` / `correcto` / `aceptadas`.
@@ -26,7 +33,7 @@ export const PREGUNTAS_SEED: Pregunta[] = [
       { id: "c", texto: "Agosto" },
       { id: "d", texto: "Octubre" },
     ],
-    correctas: ["d"],
+    correctas: ["b"],
   },
   {
     id: "p3",
@@ -45,9 +52,8 @@ export const PREGUNTAS_SEED: Pregunta[] = [
   },
   {
     id: "p4",
-    tipo: "multiple",
+    tipo: "opcion",
     enunciado: "¿Cuándo se enteraron del embarazo?",
-    subtitulo: "Hay dos respuestas correctas 👀",
     activa: true,
     timer: 20,
     puntaje: 1000,
@@ -57,7 +63,7 @@ export const PREGUNTAS_SEED: Pregunta[] = [
       { id: "c", texto: "+2 mes" },
       { id: "d", texto: "+3 mes" },
     ],
-    correctas: ["a", "d"],
+    correctas: ["a"],
   },
   {
     id: "p5",
