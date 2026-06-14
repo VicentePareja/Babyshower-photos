@@ -237,3 +237,21 @@ body {
 .fila-ranking {
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* ---------- Slideshow ---------- */
+
+/* barra de progreso del autoavance (debe durar lo mismo que AVANCE_MS = 5s) */
+@media (prefers-reduced-motion: no-preference) {
+  .barra-progreso {
+    animation: barra-progreso 5s linear forwards;
+  }
+}
+
+@keyframes barra-progreso {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Confeti } from "@/components/confeti";
-import { Camara, Champinon } from "@/components/ilustraciones";
+import { Camara, Champinon, Galeria } from "@/components/ilustraciones";
 import { compressImage } from "@/lib/compress";
 import { getSupabase } from "@/lib/supabase";
 
@@ -21,7 +21,8 @@ export function FormularioSubida() {
   const [caption, setCaption] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const galeriaRef = useRef<HTMLInputElement>(null);
+  const camaraRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -102,7 +103,8 @@ export function FormularioSubida() {
     setError(null);
     setEstado("eligiendo");
     // permite volver a elegir el mismo archivo
-    if (inputRef.current) inputRef.current.value = "";
+    if (galeriaRef.current) galeriaRef.current.value = "";
+    if (camaraRef.current) camaraRef.current.value = "";
   }
 
   if (estado === "exito") {
@@ -129,9 +131,19 @@ export function FormularioSubida() {
 
   return (
     <div className="anima-aparece space-y-5">
+      {/* Galería: sin `capture` para que el celular abra el carrete de fotos */}
       <input
-        ref={inputRef}
-        id="foto"
+        ref={galeriaRef}
+        id="foto-galeria"
+        type="file"
+        accept="image/*"
+        onChange={elegirArchivo}
+        className="sr-only"
+      />
+      {/* Cámara: `capture` abre directamente la cámara trasera */}
+      <input
+        ref={camaraRef}
+        id="foto-camara"
         type="file"
         accept="image/*"
         capture="environment"
@@ -140,18 +152,30 @@ export function FormularioSubida() {
       />
 
       {estado === "eligiendo" || !previewUrl ? (
-        <label
-          htmlFor="foto"
-          className="flex min-h-56 cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl border-4 border-dashed border-salvia bg-crema/70 p-8 text-center transition-colors hover:border-musgo active:scale-[0.99]"
-        >
-          <Camara className="h-16 w-16" />
-          <span className="font-display text-xl font-bold text-bosque">
-            Toca para tomar o elegir una foto
-          </span>
-          <span className="text-sm text-madera">
-            Puedes usar la cámara o tu galería
-          </span>
-        </label>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label
+            htmlFor="foto-galeria"
+            className="flex min-h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border-4 border-dashed border-salvia bg-crema/70 p-6 text-center transition-colors hover:border-musgo active:scale-[0.99]"
+          >
+            <Galeria className="h-14 w-14" />
+            <span className="font-display text-xl font-bold text-bosque">
+              Elegir de la galería
+            </span>
+            <span className="text-sm text-madera">
+              Sube una foto que ya tienes guardada
+            </span>
+          </label>
+          <label
+            htmlFor="foto-camara"
+            className="flex min-h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border-4 border-dashed border-salvia bg-crema/70 p-6 text-center transition-colors hover:border-musgo active:scale-[0.99]"
+          >
+            <Camara className="h-14 w-14" />
+            <span className="font-display text-xl font-bold text-bosque">
+              Tomar una foto
+            </span>
+            <span className="text-sm text-madera">Usa la cámara ahora</span>
+          </label>
+        </div>
       ) : (
         <div className="space-y-5 rounded-3xl bg-crema p-5 shadow-hoja">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -161,7 +185,7 @@ export function FormularioSubida() {
             className="max-h-96 w-full rounded-2xl object-contain"
           />
           <label
-            htmlFor="foto"
+            htmlFor="foto-galeria"
             className="block cursor-pointer text-center text-sm font-bold text-pino underline"
           >
             Cambiar foto
