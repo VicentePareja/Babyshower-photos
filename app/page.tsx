@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Contadores } from "@/components/contadores";
-import { ResultadosTrivia } from "@/components/trivia/resultados-landing";
 import {
   Brote,
   Camara,
@@ -8,6 +7,7 @@ import {
   EscenaBosque,
   Galeria,
   Luciernagas,
+  Trofeo,
 } from "@/components/ilustraciones";
 import { FLAGS } from "@/lib/flags";
 
@@ -66,9 +66,6 @@ export default function Inicio() {
         <Contadores />
       </section>
 
-      {/* Mini-resultados de la competencia (aparece solo si hay puntajes) */}
-      {FLAGS.trivia && <ResultadosTrivia />}
-
       {/* Tarjetas de navegación */}
       <nav
         aria-label="Secciones"
@@ -108,17 +105,30 @@ export default function Inicio() {
         ))}
       </nav>
 
+      {/* Resultados de la competencia (el juego ya ocurrió) */}
+      {FLAGS.trivia && (
+        <Link
+          href="/resultados"
+          className="anima-aparece group mt-4 flex min-h-28 items-center gap-4 rounded-3xl bg-gradient-to-br from-musgo to-pino p-5 text-pergamino shadow-hoja transition-all hover:-translate-y-0.5 hover:shadow-hoja-lg active:scale-[0.98]"
+          style={{ animationDelay: "0.25s" }}
+        >
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-pergamino/15">
+            <Trofeo className="h-10 w-10" />
+          </span>
+          <span>
+            <span className="block font-display text-xl font-bold">
+              Resultados de la Competencia
+            </span>
+            <span className="block text-sm text-pergamino/90">
+              El podio, el ranking y el detalle de cada pregunta
+            </span>
+          </span>
+        </Link>
+      )}
+
       {/* Extras */}
-      {(FLAGS.oraculo || FLAGS.slideshow || FLAGS.trivia) && (
+      {(FLAGS.oraculo || FLAGS.slideshow) && (
         <footer className="mt-10 flex flex-wrap justify-center gap-4 text-sm font-bold">
-          {FLAGS.trivia && (
-            <Link
-              href="/trivia"
-              className="rounded-full bg-amanita px-5 py-3 text-pergamino transition-transform active:scale-95"
-            >
-              🍄 Jugar la Competencia
-            </Link>
-          )}
           {FLAGS.oraculo && (
             <Link
               href="/oraculo"

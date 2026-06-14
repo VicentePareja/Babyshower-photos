@@ -225,6 +225,32 @@ export function Galeria({ className = "" }: { className?: string }) {
   );
 }
 
+export function Trofeo({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      {/* asas */}
+      <path
+        d="M16 16H9c0 9 4 13 10 14M48 16h7c0 9-4 13-10 14"
+        stroke="#7A5230"
+        strokeWidth="3.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      {/* copa */}
+      <path d="M16 12h32v10c0 10-7 16-16 16s-16-6-16-16V12Z" fill="#D8A23A" />
+      <path d="M20 15h24v7c0 8-5 12-12 12s-12-4-12-12v-7Z" fill="#E8C46A" />
+      {/* estrella */}
+      <path
+        d="M32 19l2.2 4.5 5 .7-3.6 3.5.9 5L32 30.4 27.5 32.7l.9-5-3.6-3.5 5-.7L32 19Z"
+        fill="#fffdf6"
+      />
+      {/* base */}
+      <rect x="28" y="38" width="8" height="8" fill="#7A5230" />
+      <rect x="20" y="46" width="24" height="6" rx="2" fill="#5d3e24" />
+    </svg>
+  );
+}
+
 export function Luciernagas({ className = "" }: { className?: string }) {
   const puntos = [
     { x: 12, y: 18, d: "0s" },
