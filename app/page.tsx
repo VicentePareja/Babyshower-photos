@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Contadores } from "@/components/contadores";
+import { ResultadosTrivia } from "@/components/trivia/resultados-landing";
 import {
   Brote,
   Camara,
@@ -64,6 +65,9 @@ export default function Inicio() {
       <section className="anima-aparece mt-6" style={{ animationDelay: "0.1s" }}>
         <Contadores />
       </section>
+
+      {/* Mini-resultados de la competencia (aparece solo si hay puntajes) */}
+      {FLAGS.trivia && <ResultadosTrivia />}
 
       {/* Tarjetas de navegación */}
       <nav
